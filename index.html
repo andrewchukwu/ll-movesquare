@@ -1,0 +1,247 @@
+<html>
+<!-- These marks are comments, it allows us to write comment on what a piece of code does.
+Comments are very useful as it allows other people to understand what the computer
+program is doing. Look out for these and see if you can understand how this computer
+program works.
+
+ABOUT THIS PROGRAM:
+We will look at the very basic of a 2D game. Mathematics is very important in game programming as we have to
+do a lot of calculations. This example, we have a square object on the screen and we will look at a simple
+computer program that allows us to move the object around on the screen/canvas.
+When playing games , you'll notice that the character cannot disappear off the screen - this requires
+some mathematics to ensure that we can move the character to a place where we cannot see him.
+
+
+<> - These arrows (known as tags) represent actions for your browser to do something. This is XML language. XML
+has a lot of tags as you are about to see.
+
+<html> -  The HTML tag tells the browser that we are creating a web page using HTML language
+
+-->
+
+<!-- <center> - Tell the browser to put anything inside this tag in the centre of the browser page (american spelling)-->
+<center>
+    <!-- <specifies the canvas we will draw our game graphics on. How big is the canvas? -->
+    <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
+</center>
+<!-- </center> - The </> tags tells the browser to end the current processing. So now we have stopped putting
+things in the centre of the page -->
+
+
+<!-- Now things get interesting. We start to do some programming to make the web page do something -->
+
+<!-- JavaScript is the main web programming language. Usually we place it in a separate file, but we can
+also put it with HTML using the <script> tag.
+-->
+<script>
+
+    /* There is a lot happening here - Notice that we have also changed the symbols used to make a comment.
+     * Inside the <script> tag, we are no longer writing HTML, but JavaScript
+     *
+     * "var" - This indicates a variable. A variable has a name e.g. 'var myName'
+     * A variable holds a value that can be later changed. So, if we define:
+     *
+     * var A = 1; //We set the value of variable A to 1
+     * A = A + 1; //We add 1 to the variable, now variable A has the value of 2
+     */
+
+
+
+    /*
+     * Here we get a reference to the 'canvas' above. A reference lets us make changes to earlier definitions
+     * like we are doing here with the canvas - We are setting additional values and features. Don't worry
+     * too much about
+     *
+     */
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+
+    /**
+     * Frames per second - This is how fast the screen needs to redraw all the objects on the screen
+     */
+    var FramesPerSecond = 30;
+
+    /**The speed at which we move the object - number of pixels per move*/
+    var SPEED = 32;
+
+    /**The size of the square (32 by 32)*/
+    var SQUARE_SIZE=32;
+
+    /**
+     * Enables debug output on screen
+     */
+    var DEBUG= true;
+
+
+
+    /**
+     * Size of the Canvas which the object is on
+     */
+    var canvasWidth = 500;
+    var canvasHeight = 500;
+
+    /**
+     * Because we will do quite a bit with the object, we have grouped together some values
+     * and functions. This helps the code to be clearer. We also refer to the player as
+     * the object or the square
+     */
+    var player = {
+        color: "#000", //The colour of the square (How can we change it to red?)
+        width: SQUARE_SIZE, //use variable to set the values.
+        height: SQUARE_SIZE,
+
+        /**
+         * The initial position of the player on the canvas. This needs to be smaller than the width and height
+         * of the canvas otherwise we wont see it on the screen
+         */
+        xPosition: 200,
+        yPosition: 200,
+
+        /**
+         * We draw the player in the given color.
+         * this.xPosition - The players x co-ordinate position
+         * this.yPosition - The players y co-ordinate position
+         * this.width - refers to the above width value
+         * this.height - refers to the above height value
+         */
+        draw: function () {
+            //Set the color to fill the rectangle
+            ctx.fillStyle = this.color;
+            //Draw the object as a filled rectangle
+            ctx.fillRect(this.xPosition, this.yPosition, this.width, this.height);
+
+            //Paint a red dot in the top corner as a reference point for the co-ordinates
+            ctx.fillStyle = "#F00";
+            ctx.fillRect(this.xPosition, this.yPosition, 5, 5);
+
+            if(DEBUG)
+            {
+                //Output some debug information at the given position
+                ctx.fillStyle = "#000";
+                ctx.font="15px normal";
+                ctx.fillText("xPosition="+this.xPosition+";yPosition="+this.yPosition
+                +";canvasWidth="+canvasWidth+";canvasHeight="+canvasHeight,10,15);
+            }
+        },
+
+        /**
+         * Information function - print information on our current position
+         */
+        info: function(){
+            /**
+             * An info() function that prints out the current co-ordinates of the
+             * object. Some commands can be spread across multiple lines
+             */
+            console.log("xPosition="+player.xPosition+";yPosition="+player.yPosition
+                +";canvasWidth="+canvasWidth+";canvasHeight="+canvasHeight);
+        }
+    };
+
+    /**
+     * Whats this?
+     *
+     * setInterval() - Wherever we see this sort of format, we are calling a function(). A function can contain
+     * a piece of code which we can call multiple times. Functions let us group actions together so we can
+     * call them again and again
+     *
+     * setInterval - This calls a function in the background - The function updates and draws the graphics
+     * 30 times a second. 1000 milliseconds = 1 second. 1/30 = 0.03 seconds. So we re-draw the screen every 0.03
+     * seconds. Very fast - so fast that you can't see it happening
+     */
+
+    setInterval(
+        //We defined a function. This function will be called 'FramesPerSecond' i.e. 30 times per second
+        function () {
+        update();
+        draw();
+    }, 1000 / FramesPerSecond);
+
+
+    /**
+     * One of the functions called in the background. This function calls another
+     * function. Where you see NAME() - this is calling a function called NAME.
+     * The function will usually be defined somewhere on the page
+     */
+    function update() {
+        key(); //This checks if we are pressing the key
+    }
+
+
+    /**
+     * The draw function. This does two things. Clears the canvas and draws the player on the screen
+     */
+    function draw() {
+        /**
+         *The clearRect() function is used to clean the canvas. The rectangle is the
+         * same size as the canvas
+         */
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        /**
+         * We then call the draw function on the player object for the player to be
+         * drawn on the clean canvas
+         */
+        player.draw();
+
+    }
+
+    /**
+     * This function is called by the setInterval() function - it checks what key is being pressed
+     * so we can move the object. The required understanding of the co-ordinate system so
+     * you can move the object in the correct direction.
+     */
+    function key() {
+        var x = 0;
+        var keyPressed = 0;
+        document.onkeydown = function (e) {
+            var e = window.event || e
+            x = String.fromCharCode(e.keyCode);
+            keyPressed = e.keyCode;
+
+
+            /**We can use comments also to exclude code from running also*/
+            //alert(x + " " + keyPressed );
+
+            //Up movement
+            /**
+             * If keyPressed in UP and the object is within the boundary we
+             * can move
+             */
+            if (keyPressed == 38 ){
+                console.log("Key pressed: UP"); //log the key pressed
+                //Move the object in the negative direction on the canvas
+                player.yPosition -= SPEED; //Move in negative direction
+                //if(player.yPosition<=0) player.yPosition=0; //fix movement out of canvas
+            }
+
+            // Down movement
+            if (keyPressed == 40){
+                console.log("Key pressed: DOWN");
+                player.yPosition += SPEED; //Move in positive direction
+                //if(player.yPosition> canvasHeight-SQUARE_SIZE) yPosition=canvasHeight-SQUARE_SIZE; //fix movement out of canvas
+            }
+
+            //Left Movement
+            if (keyPressed == 37){
+                console.log("Key pressed: LEFT");
+                player.xPosition -= SPEED; //Move in negative direction
+                //if(player.xPosition<=0) player.xPosition=0; //fix movement out of canvas
+            }
+
+            //Right Movement
+            if (keyPressed == 39){
+                console.log("Key pressed: RIGHT");
+                player.xPosition += SPEED; //move in positive direction
+                //if(player.xPosition+SQUARE_SIZE>canvasWidth) player.xPosition=canvasWidth-SQUARE_SIZE; //fix movement out of canvas
+            }
+
+            /*Calls the info() function to print out location information*/
+            player.info();
+        }
+    }
+/**
+ * Now we have finished coding in Javascript
+ */
+</script>
+<!-- Now we have finished writing HTML, so we close the tag -->
+</html>
